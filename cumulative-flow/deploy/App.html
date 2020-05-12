@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>cumulative-flow</title>
+
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",currentRelease:{releaseName:"PI-6",releaseStartDate:"2020-02-12",releaseEndDate:"2020-05-05"},launch:function(){this.add({xtype:"rallyreleasecombobox",listeners:{select:this.onReleaseSelected,scope:this}})},onReleaseSelected:function(e,t){console.log("onReleaseSelected",e,t),this.down("rallychart")&&this.down("rallychart").destroy();var a=t[0];Ext.create("Rally.data.wsapi.Store",{model:"HierarchicalRequirement",autoLoad:!0,pageSize:2e3,filters:[{property:"Release.Name",operator:"=",value:a.get("Name")}],limit:1/0,listeners:{load:function(e,t,r){console.log("load",e,t,r),this.buildGraph(t,a)},scope:this},fetch:["PlanEstimate","ScheduleState","CreationDate","InProgressDate","AcceptedDate","c_ExternalAcceptedDate","c_ExternalCreationDate","c_ExternalInProgressDate"]})},buildGraph:function(e,t){console.log("buildGraph",e,t);var a=this.restructureData(e,t);console.log("buildGraph - restructureData",a),this.addGraph(a)},addGraph:function(e){this.add({xtype:"rallychart",chartData:e,chartConfig:{chart:{type:"area"},title:{text:"Cumulative Flow Chart"},xAxis:{tickInterval:10,labels:{formatter:function(){return Rally.util.DateTime.format(this.value,"Y-m-d")}}},yAxis:{min:0,title:{text:"Points"}},plotOptions:{area:{stacking:"normal",lineColor:"#666666",lineWidth:1,marker:{lineWidth:1,lineColor:"#666666"}}}}})},restructureData:function(e,t){for(var a=new Date(t.get("ReleaseStartDate")),r=new Date(t.get("ReleaseDate")),l=[],n={Defined:[],InProgress:[],Accepted:[]},o=a,s=0;o<r;){n.Accepted[s]=0,n.InProgress[s]=0,n.Defined[s]=0,l.push(o);for(var i=0;i<e.length;i++){var c=e[i],d=c.get("c_ExternalCreationDate")||c.get("CreationDate"),p=c.get("c_ExternalInProgressDate")||c.get("InProgressDate"),u=c.get("c_ExternalAcceptedDate")||c.get("AcceptedDate"),h=c.get("PlanEstimate");u<o?n.Accepted[s]+=h:p<o?n.InProgress[s]+=h:d<o&&(n.Defined[s]+=h)}o=Rally.util.DateTime.add(o,"day",1),s++}console.log("series",n),console.log("categories",l);var g=_.map(n,function(e,t){return{name:t,data:e}});return console.log("newSeries",g),{series:g,categories:l}}});
+
+            Rally.launchApp('CustomApp', {
+                name:"cumulative-flow",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>

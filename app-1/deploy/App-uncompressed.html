@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>app-1</title>
+
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define('CustomApp', {
+    extend: 'Rally.app.App',
+    componentCls: 'app',
+    launch: function() {
+        this.addAGrid();
+
+        //API Docs: https://help.rallydev.com/apps/2.1/doc/
+    },
+    updateClicked: function(){
+
+    },
+    addAGrid: function(){
+
+      this.add({
+         xtype: 'rallygrid',
+         columnCfgs: [
+             'FormattedID',
+             'Name',
+             'Owner'
+         ],
+         storeConfig: {
+             model: 'userstory'
+         }
+     });
+    }
+});
+
+
+            Rally.launchApp('CustomApp', {
+                name:"app-1",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+
+    <style type="text/css">
+        .app {
+  /* Add app styles here */
+}
+
+    </style>
+</head>
+<body>
+</body>
+</html>

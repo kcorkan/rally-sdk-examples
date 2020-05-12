@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>enhanced-velocity</title>
+
+    <script type="text/javascript" src="https://rally1.rallydev.com/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",config:{defaultSettings:{migratedAcceptedDateField:"c_ExternalAcceptedDate",maxIterations:16}},launch:function(){console.log("migratedAcceptedDateField setting",this.getSetting("migratedAcceptedDateField")),this.loadIterations()},loadIterations:function(){var e=this.getSetting("maxIterations");Ext.create("Rally.data.wsapi.Store",{model:"Iteration",fetch:["Name","EndDate"],context:{project:this.getContext().getProject()._ref,projectScopeDown:!1,projectScopeUp:!1},filters:[{property:"EndDate",operator:"<",value:"today"}],sorters:[{property:"EndDate",direction:"DESC"}],limit:e,pageSize:e,listeners:{load:function(e,t,a){console.log("iterations loaded",t),this.loadArtifacts(t)},scope:this}}).load()},loadArtifacts:function(e){Ext.create("Rally.data.wsapi.Store",{model:"HierarchicalRequirement",fetch:["Iteration","PlanEstimate",this.getSetting("migratedAcceptedDateField"),"AcceptedDate","ScheduleState","Name"],filters:this.getArtifactFilters(e),pageSize:2e3,limit:1/0,listeners:{load:function(t,a,i){console.log("artifacts loaded",a),this.buildGraph(e,a)},scope:this}}).load()},getArtifactFilters:function(e){var t=_.map(e,function(e){return{property:"Iteration",operator:"=",value:e.get("_ref")}});return Rally.data.wsapi.Filter.or(t)},buildGraph:function(e,t){var a=this.buildGraphData(e,t);console.log("graphData",a),this.add({xtype:"rallychart",chartConfig:{chart:{type:"column"},title:{text:"Enhanced Velocity"},xAxis:{},yAxis:{title:{text:"Points"}},plotOptions:{column:{stacking:"normal"}}},chartData:a})},buildGraphData:function(e,t){console.log("buildGraphData",e,t);for(var a={},i=0;i<e.length;i++){var r=e[i].get("Name");a[r]={},a[r].EndDate=e[i].get("EndDate"),a[r].AcceptedDuringIteration=0,a[r].AcceptedAfterIteration=0,a[r].Unaccepted=0}var n=this.getSetting("migratedAcceptedDateField");for(i=0;i<t.length;i++){console.log("migratedAcceptedDateField",n);var o=t[i].get("PlanEstimate"),l=t[i].get("Iteration").Name,c=t[i].get(n)||t[i].get("AcceptedDate")||null;console.log("migratedAcceptedDateField",n,t[i].get(n),t[i].get("AcceptedDate")),a[l]&&(c?(console.log("acceptedDate",c,a[l].EndDate),c<a[l].EndDate?a[l].AcceptedDuringIteration+=o:a[l].AcceptedAfterIteration+=o):a[l].Unaccepted+=o)}var d=[],p=[{type:"column",name:"Accepted within the Iteration",color:Rally.util.Colors.green,index:2,data:[]},{type:"column",name:"Accepted after the Iteration",color:Rally.util.Colors.light_green,index:1,data:[]},{type:"column",name:"Unaccepted",color:Rally.util.Colors.brick,index:0,data:[]}],s=[],g=0;for(var l in a)s.unshift(g++),d.unshift(l),p[2].data.unshift(a[l].Unaccepted),p[1].data.unshift(a[l].AcceptedAfterIteration),p[0].data.unshift(a[l].AcceptedDuringIteration);var u=this.calculateTrendLineData(p[0].data,s);return p.push({type:"line",data:u,name:"Accepted during iteration trend",marker:{enabled:!1}}),{categories:d,series:p}},calculateTrendLineData:function(e,t){for(var a={},i=e.length,r=0,n=0,o=0,l=0,c=0,d=0;d<e.length;d++)r+=t[d],n+=e[d],o+=t[d]*e[d],l+=t[d]*t[d],c+=e[d]*e[d];a.slope=(i*o-r*n)/(i*l-r*r),a.intercept=(n-a.slope*r)/i,a.r2=Math.pow((i*o-r*n)/Math.sqrt((i*l-r*r)*(i*c-n*n)),2);var p=[];for(d=0;d<t.length;d++){var s=t[d]*a.slope+a.intercept;p.push(s)}return p},getSettingsFields:function(){return[{xtype:"rallyfieldcombobox",model:"HierarchicalRequirement",name:"migratedAcceptedDateField",fieldLabel:"Migrated Accepted Date Field"},{xtype:"rallynumberfield",fieldLabel:"Max Iterations",name:"maxIterations",minValue:3,maxValue:26}]}});
+
+            Rally.launchApp('CustomApp', {
+                name:"enhanced-velocity",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>

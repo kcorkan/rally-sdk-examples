@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ajax-app</title>
+
+    <script type="text/javascript" src="https://rally1.rallydev.com/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",launch:function(){this.getData("https://www.google.com").then({success:function(e){console.log("response",e)}})},getData:function(e){var t=this,s=Ext.create("Deft.Deferred"),n=new XMLHttpRequest;return n.open("GET",e),n.onreadystatechange=function(){200==this.status&&4==this.readyState&&(t.logger.log("GET response: ",this.responseText),s.resolve(Ext.JSON.decode(this.responseText)))},n.send(),s.promise}});
+
+            Rally.launchApp('CustomApp', {
+                name:"ajax-app",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>

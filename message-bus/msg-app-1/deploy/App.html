@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>msg-app1</title>
+
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",launch:function(){this.subscribe(this,"app2Message",this.app2Called,this),this.add({xtype:"rallytextfield",itemId:"messageRecieved",fieldLabel:"Recieved Message"}),this.add({xtype:"rallytextfield",itemId:"messageSent",fieldLabel:"Send Message"}),this.add({xtype:"rallybutton",handler:this.sendMessage,scope:this,text:"Send Message"})},app2Called:function(e){console.log("this is from the other app: "+e),this.down("#messageRecieved").setValue(e)},sendMessage:function(){this.publish("app1Message",this.down("#messageSent").getValue())}});
+
+            Rally.launchApp('CustomApp', {
+                name:"msg-app1",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>tbscoped-app</title>
+
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define('CustomApp', {
+    extend: 'Rally.app.TimeboxScopedApp',
+    scopeType: 'iteration',
+    onScopeChange: function(scope) {
+        // render/refresh components
+        console.log('scope', scope);
+        console.log('filter for scope', scope.getQueryFilter().toString());
+    },
+    launch: function() {
+      var timeboxScope = this.getContext().getTimeboxScope();
+      if(timeboxScope) {
+          var record = timeboxScope.getRecord();
+          var name = record.get('Name');
+          var startDate = timeboxScope.getType() === 'iteration' ?
+              record.get('StartDate') : record.get('ReleaseStartDate');
+      }
+  }
+});
+
+
+            Rally.launchApp('CustomApp', {
+                name:"tbscoped-app",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+
+    <style type="text/css">
+        .app {
+  /* Add app styles here */
+}
+
+    </style>
+</head>
+<body>
+</body>
+</html>
